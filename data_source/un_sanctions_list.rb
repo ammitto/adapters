@@ -1,4 +1,5 @@
 require_relative '../utils/processor'
+
 module DataSource
   class UnSanctionsList
 
