@@ -26,8 +26,8 @@ module DataSource
         target["entity_type"] = sanction_entity.at_xpath("subjectType")["code"] rescue ""
         target["country"] = sanction_entity.at_xpath("citizenship")["countryDescription"] rescue ""
         target["birthdate"] = sanction_entity.at_xpath("birthdate")["birthdate"] rescue ""
-        target["identity_number"] = sanction_entity["euReferenceNumber"] rescue ""
-        target["identity_type"] = "EU Reference Number"
+        target["ref_number"] = sanction_entity["euReferenceNumber"] rescue ""
+        target["ref_type"] = "EU Reference Number"
         target["remark"] = sanction_entity["remark"] rescue ""
         unless sanction_entity.at_xpath("address").nil?
           address = {}
@@ -40,7 +40,7 @@ module DataSource
           po_box = address_info["poBox"]
           address["zip"] = "PO Box #{po_box}" if (address["zip"].empty? && !po_box.empty?)
           target["contact"] = address_info.xpath("contactInfo").collect { |ci| "#{ci['key']}: #{ci['value']}" }.join(", ") rescue ""
-          target["address"] = address
+          target["address"] = [address]
         end
         processed_data << target
       end
