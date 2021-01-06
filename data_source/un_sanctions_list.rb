@@ -26,6 +26,7 @@ module DataSource
                       sanction.at_xpath("THIRD_NAME"),
                       sanction.at_xpath("FOURTH_NAME")].compact.map(&:text).reject(&:blank?).map(&:strip).join(" ")
         alias_names = sanction.xpath("INDIVIDUAL_ALIAS//ALIAS_NAME | ENTITY_ALIAS//ALIAS_NAME").map(&:text).reject(&:blank?)
+        target["entity_type"] = sanction.parent.name == "INDIVIDUALS" ? "person" : "enterprise"
         target["names"] = alias_names
         target["names"].unshift(name)
         target["designation"] = sanction.at_xpath("DESIGNATION//VALUE")&.text
