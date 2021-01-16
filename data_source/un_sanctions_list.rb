@@ -8,7 +8,7 @@ module DataSource
 
     def self.fetch(time)
       Processor.download_xml(time, API_ENDPOINT, SOURCE)
-      Processor.convert_to_yaml(time, SOURCE)
+      harmonize(time)
       puts "Processed yml file is at:  ../data/processed/#{SOURCE}/#{time}/sanction_list.yaml !"
     end
 
@@ -26,7 +26,7 @@ module DataSource
                       sanction.at_xpath("THIRD_NAME"),
                       sanction.at_xpath("FOURTH_NAME")].compact.map(&:text).reject(&:blank?).map(&:strip).join(" ")
         alias_names = sanction.xpath("INDIVIDUAL_ALIAS//ALIAS_NAME | ENTITY_ALIAS//ALIAS_NAME").map(&:text).reject(&:blank?)
-        target["entity_type"] = sanction.parent.name == "INDIVIDUALS" ? "person" : "enterprise"
+        target["entity_type"] = sanction.parent.name == "INDIVIDUALS" ? "person" : "organization"
         target["names"] = alias_names
         target["names"].unshift(name)
         target["designation"] = sanction.at_xpath("DESIGNATION//VALUE")&.text

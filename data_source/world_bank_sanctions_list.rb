@@ -9,7 +9,7 @@ module DataSource
 
     def self.fetch(time)
       download_wb_json(time)
-      Processor.convert_json_to_yaml(time, SOURCE)
+      harmonize(time)
       puts "Processed yml file is at:  ../data/processed/#{SOURCE}/#{time}/sanction_list.yaml !"
     end
 
