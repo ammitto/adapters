@@ -23,7 +23,7 @@ module DataSource
         target = {}
         target["names"] = sanction_entity.xpath("nameAlias").collect { |n| n["wholeName"] } rescue ""
         target["source"] = SOURCE
-        target["entity_type"] = sanction_entity.at_xpath("subjectType")["code"] rescue ""
+        target["entity_type"] = sanction_entity.at_xpath("subjectType")["code"] == "enterprise" ? "organization" : "person" rescue ""
         target["country"] = sanction_entity.at_xpath("citizenship")["countryDescription"] rescue ""
         target["birthdate"] = sanction_entity.at_xpath("birthdate")["birthdate"] rescue ""
         target["ref_number"] = sanction_entity["euReferenceNumber"] rescue ""
