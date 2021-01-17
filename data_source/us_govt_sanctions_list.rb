@@ -1,22 +1,20 @@
-require_relative '../utils/processor'
-
 module DataSource
   class UsGovtSanctionsList
 
     API_ENDPOINT = "https://www.treasury.gov/ofac/downloads/consolidated/consolidated.xml".freeze
     SOURCE = "us_govt_sanctions_list".freeze
 
-    def self.fetch(time)
-      Processor.download_xml(time, API_ENDPOINT, SOURCE)
-      harmonize(time)
-      puts "Processed yml file is at:  ../data/processed/#{SOURCE}/#{time}/sanction_list.yaml !"
+    def self.fetch
+      Processor.download_xml(API_ENDPOINT, SOURCE)
+      harmonize
+      puts "Processed yml file is at:  ../data/processed/#{SOURCE}.yaml !"
     end
 
-    def self.harmonize(time)
-      downloaded_directory = "../data/downloaded/#{SOURCE}/#{time}"
-      dest_directory = "../data/processed/#{SOURCE}/#{time}"
+    def self.harmonize
+      downloaded_directory = "../data/downloaded"
+      dest_directory = "../data/processed"
       processed_data = []
-      data = Nokogiri.XML(open("#{downloaded_directory}/sanction_list.xml"))
+      data = Nokogiri.XML(open("#{downloaded_directory}/#{SOURCE}.xml"))
       data.remove_namespaces!
       sanctions = data.xpath("sdnList//sdnEntry")
       sanctions.each do |sanction|
@@ -58,8 +56,9 @@ module DataSource
         target["documents"] = documents
         processed_data << target
       end
+
       FileUtils.mkdir_p dest_directory
-      open("#{dest_directory}/processed.yaml", "w") { |file| file.write(processed_data.to_yaml) }
+      open("#{dest_directory}/#{SOURCE}.yaml", "w") { |file| file.write(processed_data.to_yaml) }
     end
 
   end

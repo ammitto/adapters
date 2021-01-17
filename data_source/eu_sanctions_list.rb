@@ -1,22 +1,20 @@
-require_relative '../utils/processor'
-
 module DataSource
   class EuSanctionsList
 
     API_ENDPOINT = "https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw".freeze
     SOURCE = "eu_sanctions_list".freeze
 
-    def self.fetch(time)
-      Processor.download_xml(time, API_ENDPOINT, SOURCE)
-      harmonize(time)
-      puts "Processed yml file is at:  ../data/processed/#{SOURCE}/#{time}/processed.yaml !"
+    def self.fetch
+      Processor.download_xml(API_ENDPOINT, SOURCE)
+      harmonize
+      puts "Processed yml file is at:  ../data/processed/#{SOURCE}.yaml !"
     end
 
-    def self.harmonize(time)
-      downloaded_directory = "../data/downloaded/#{SOURCE}/#{time}"
-      dest_directory = "../data/processed/#{SOURCE}/#{time}"
+    def self.harmonize
+      downloaded_directory = "../data/downloaded"
+      dest_directory = "../data/processed"
       processed_data = []
-      data = Nokogiri.XML(open("#{downloaded_directory}/sanction_list.xml"))
+      data = Nokogiri.XML(open("#{downloaded_directory}/#{SOURCE}.xml"))
       data.remove_namespaces!
       sanction_entities = data.xpath("export//sanctionEntity")
       sanction_entities.each do |sanction_entity|
@@ -46,26 +44,9 @@ module DataSource
       end
 
       FileUtils.mkdir_p dest_directory
-      open("#{dest_directory}/processed.yaml", "w") { |file| file.write(processed_data.to_yaml) }
+      open("#{dest_directory}/#{SOURCE}.yaml", "w") { |file| file.write(processed_data.to_yaml) }
     end
-
-    ######################################## DATA MODEL ##########################################
-    # Names
-    # Gender
-    # Address
-    #  - Street
-    #  - Zip
-    #  - City
-    #  - State
-    #  - Country
-    # Contact
-    # BirthDate
-    # EntityType
-    # IdentityType
-    # IdentityNumber
-    # Remark
-    ######################################## DATA MODEL ##########################################
-
   end
+
 end
 

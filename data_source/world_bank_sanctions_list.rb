@@ -1,5 +1,3 @@
-require_relative '../utils/processor'
-
 module DataSource
   class WorldBankSanctionsList
 
@@ -7,13 +5,13 @@ module DataSource
     SOURCE = "world_bank".freeze
     API_KEY = "z9duUaFUiEUYSHs97CU38fcZO7ipOPvm".freeze
 
-    def self.fetch(time)
-      download_wb_json(time)
-      harmonize(time)
-      puts "Processed yml file is at:  ../data/processed/#{SOURCE}/#{time}/sanction_list.yaml !"
+    def self.fetch
+      download_wb_json
+      harmonize
+      puts "Processed yml file is at:  ../data/processed/#{SOURCE}.yaml !"
     end
 
-    def self.download_wb_json(time)
+    def self.download_wb_json
       uri = URI.parse(API_ENDPOINT)
       request = Net::HTTP::Get.new(uri)
       request.content_type = "application/json"
@@ -22,18 +20,18 @@ module DataSource
       response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
         http.request(request)
       end
-      directory = "../data/downloaded/#{SOURCE}/#{time}"
+      directory = "../data/downloaded"
       FileUtils.mkdir_p directory
-      open("#{directory}/sanction_list.json", "wb") do |file|
+      open("#{directory}/#{SOURCE}.json", "wb") do |file|
         file.write(response.body)
       end
     end
 
-    def self.harmonize(time)
-      downloaded_directory = "../data/downloaded/#{SOURCE}/#{time}"
-      dest_directory = "../data/processed/#{SOURCE}/#{time}"
+    def self.harmonize
+      downloaded_directory = "../data/downloaded"
+      dest_directory = "../data/processed"
       processed_data = []
-      data = JSON.parse(File.read("#{downloaded_directory}/sanction_list.json"))
+      data = JSON.parse(File.read("#{downloaded_directory}/#{SOURCE}.json"))
       data["response"]["ZPROCSUPP"].each do |sanction_entity|
         target = {}
         target["names"] = "#{sanction_entity["SUPP_PRE_ACRN"]} #{sanction_entity["SUPP_NAME"]}".strip
@@ -53,7 +51,7 @@ module DataSource
       end
 
       FileUtils.mkdir_p dest_directory
-      open("#{dest_directory}/processed.yaml", "w") { |file| file.write(processed_data.to_yaml) }
+      open("#{dest_directory}/#{SOURCE}.yaml", "w") { |file| file.write(processed_data.to_yaml) }
     end
 
   end

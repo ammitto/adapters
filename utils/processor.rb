@@ -1,6 +1,6 @@
 class Processor
 
-  def self.download_xml(time, url, source)
+  def self.download_xml(url, source)
     uri = URI.parse(url)
     request = Net::HTTP::Get.new(uri)
     request.content_type = "application/xml"
@@ -8,10 +8,21 @@ class Processor
     response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
       http.request(request)
     end
-    directory = "../data/downloaded/#{source}/#{time}"
+    directory = "../data/downloaded"
     FileUtils.mkdir_p directory
-    open("#{directory}/sanction_list.xml", "wb") do |file|
+    open("#{directory}/#{source}.xml", "wb") do |file|
       file.write(response.body)
+    end
+  end
+
+  def self.file_prepend(file, str)
+    new_contents = ""
+    File.open(file, 'r') do |fd|
+      contents = fd.read
+      new_contents = str << contents
+    end
+    File.open(file, 'w') do |fd|
+      fd.write(new_contents)
     end
   end
 
