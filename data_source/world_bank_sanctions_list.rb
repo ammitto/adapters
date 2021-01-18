@@ -2,7 +2,7 @@ module DataSource
   class WorldBankSanctionsList
 
     API_ENDPOINT = "https://apigwext.worldbank.org/dvsvc/v1.0/json/APPLICATION/ADOBE_EXPRNCE_MGR/FIRM/SANCTIONED_FIRM".freeze
-    SOURCE = "world_bank".freeze
+    SOURCE = "world_bank_sanctions_list".freeze
     API_KEY = "z9duUaFUiEUYSHs97CU38fcZO7ipOPvm".freeze
 
     def self.fetch
