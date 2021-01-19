@@ -34,7 +34,7 @@ module DataSource
       data = JSON.parse(File.read("#{downloaded_directory}/#{SOURCE}.json"))
       data["response"]["ZPROCSUPP"].each do |sanction_entity|
         target = {}
-        target["names"] = "#{sanction_entity["SUPP_PRE_ACRN"]} #{sanction_entity["SUPP_NAME"]}".strip
+        target["names"] = ["#{sanction_entity["SUPP_PRE_ACRN"]} #{sanction_entity["SUPP_NAME"]}".strip]
         target["country"] = sanction_entity["COUNTRY_NAME"]
         target["source"] = SOURCE
         target["ref_number"] = sanction_entity["SUPP_ID"]
