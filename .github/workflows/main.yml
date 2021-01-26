@@ -39,5 +39,5 @@ jobs:
       - name: Show directory structure
           shell: bash
           run: |
-           pwd
-           ls
+            pwd
+            ls
