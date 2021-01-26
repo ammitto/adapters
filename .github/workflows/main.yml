@@ -15,8 +15,8 @@ jobs:
       matrix:
         ruby: [ '2.6' ]
     steps:
-      - name: 'Preparing data repo'
-        uses: actions/checkout@v2
+      - name: Preparing data repo
+        uses: actions/checkout@master
         with:
           repository: ammitto/data
           path: data
@@ -36,7 +36,7 @@ jobs:
         run: |
           sudo gem install bundler --force
           bundle install --jobs 4 --retry 3
-       - name: Show directory structure
+      - name: Show directory structure
         shell: bash
         run: |
           pwd
