@@ -9,11 +9,15 @@ require_all 'data_source'
 require_all 'utils'
 
 time = Time.now.strftime("%d-%m-%Y-%H:%M:%S")
-log_file = "../data/update.log"
+log_file = "../data"
 
-DataSource.constants.each do |klass|
-  "DataSource::#{klass}".constantize.fetch
-end
+# DataSource.constants.each do |klass|
+#   "DataSource::#{klass}".constantize.fetch
+# end
 
-Processor.file_prepend(log_file, "Updated at : #{time}\n")
+#Processor.file_prepend(log_file, "Updated at : #{time}\n")
+
+puts Dir.children("../data")
+
+
 puts "Done at #{time}!"
