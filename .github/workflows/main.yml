@@ -34,7 +34,6 @@ jobs:
       - name: 'Preparing data repo'
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.PAT }}
           repository: ammitto/data
           path: data
       - name: Run specs
