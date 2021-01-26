@@ -17,6 +17,7 @@ log_file = "../data"
 
 #Processor.file_prepend(log_file, "Updated at : #{time}\n")
 
+puts Dir.pwd
 puts Dir.children("/home/runner/work/data/data")
 
 
