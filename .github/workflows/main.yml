@@ -9,7 +9,7 @@ on:
 jobs:
   update-data:
     name: Updating data
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -22,7 +22,6 @@ jobs:
           auth_header="$(git config --local --get http.https://github.com/.extraheader)"
           git submodule sync --recursive
           git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-          cd .. && git clone git@github.com:ammitto/data.git
       - name: Use Ruby
         uses: actions/setup-ruby@v1
         with:
@@ -32,6 +31,12 @@ jobs:
         run: |
           sudo gem install bundler --force
           bundle install --jobs 4 --retry 3
+      - name: 'Preparing data repo'
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: ammitto/data
+          path: data
       - name: Run specs
         run: |
           ruby adapter.rb
