@@ -36,6 +36,8 @@ jobs:
         with:
           repository: ammitto/data
           path: data
-      - name: Run specs
-        run: |
-          ruby adapter.rb
+      - name: Show directory structure
+          shell: bash
+          run: |
+           pwd
+           ls
