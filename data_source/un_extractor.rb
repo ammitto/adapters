@@ -1,18 +1,19 @@
 module DataSource
-  class UnSanctionsList
+  class UnExtractor
 
     API_ENDPOINT = "https://scsanctions.un.org/resources/xml/en/consolidated.xml".freeze
-    SOURCE = "un_sanctions_list".freeze
+    SOURCE = "un-data".freeze
 
     def self.fetch
-      Processor.download_xml(API_ENDPOINT, SOURCE)
+      Processor.download_xml(API_ENDPOINT, SOURCE, "../#{SOURCE}/downloaded")
       harmonize
-      puts "Processed yml file is at:  ../data/processed/#{SOURCE}.yaml !"
+      puts "Processed yml file is at:  ../#{SOURCE}/processed !"
+      Processor.file_prepend("../#{SOURCE}/update.log", "Updated at : #{Time.now.strftime("%d-%m-%Y-%H:%M:%S")}\n")
     end
 
     def self.harmonize
-      downloaded_directory = "../data/downloaded"
-      dest_directory = "../data/processed"
+      downloaded_directory = "../#{SOURCE}/downloaded"
+      dest_directory = "../#{SOURCE}/processed"
       processed_data = []
       data = Nokogiri.XML(open("#{downloaded_directory}/#{SOURCE}.xml"))
       data.remove_namespaces!
@@ -59,7 +60,7 @@ module DataSource
       end
 
       FileUtils.mkdir_p dest_directory
-      open("#{dest_directory}/#{SOURCE}.yaml", "w") { |file| file.write(processed_data.to_yaml) }
+      open("#{dest_directory}/sanction_list.yaml", "w") { |file| file.write(processed_data.to_yaml) }
     end
 
   end

@@ -1,14 +1,15 @@
 module DataSource
-  class WorldBankSanctionsList
+  class WbExtractor
 
     API_ENDPOINT = "https://apigwext.worldbank.org/dvsvc/v1.0/json/APPLICATION/ADOBE_EXPRNCE_MGR/FIRM/SANCTIONED_FIRM".freeze
-    SOURCE = "world_bank_sanctions_list".freeze
+    SOURCE = "wb-data".freeze
     API_KEY = "z9duUaFUiEUYSHs97CU38fcZO7ipOPvm".freeze
 
     def self.fetch
       download_wb_json
       harmonize
-      puts "Processed yml file is at:  ../data/processed/#{SOURCE}.yaml !"
+      puts "Processed yml file is at:  ../#{SOURCE}/processed !"
+      Processor.file_prepend("../#{SOURCE}/update.log", "Updated at : #{Time.now.strftime("%d-%m-%Y-%H:%M:%S")}\n")
     end
 
     def self.download_wb_json
@@ -20,7 +21,7 @@ module DataSource
       response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
         http.request(request)
       end
-      directory = "../data/downloaded"
+      directory = "../#{SOURCE}/downloaded"
       FileUtils.mkdir_p directory
       open("#{directory}/#{SOURCE}.json", "wb") do |file|
         file.write(response.body)
@@ -28,8 +29,8 @@ module DataSource
     end
 
     def self.harmonize
-      downloaded_directory = "../data/downloaded"
-      dest_directory = "../data/processed"
+      downloaded_directory = "../#{SOURCE}/downloaded"
+      dest_directory = "../#{SOURCE}/processed"
       processed_data = []
       data = JSON.parse(File.read("#{downloaded_directory}/#{SOURCE}.json"))
       data["response"]["ZPROCSUPP"].each do |sanction_entity|
@@ -51,7 +52,7 @@ module DataSource
       end
 
       FileUtils.mkdir_p dest_directory
-      open("#{dest_directory}/#{SOURCE}.yaml", "w") { |file| file.write(processed_data.to_yaml) }
+      open("#{dest_directory}/sanction_list.yaml", "w") { |file| file.write(processed_data.to_yaml) }
     end
 
   end

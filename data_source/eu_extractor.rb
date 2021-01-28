@@ -1,18 +1,19 @@
 module DataSource
-  class EuSanctionsList
+  class EuExtractor
 
     API_ENDPOINT = "https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw".freeze
-    SOURCE = "eu_sanctions_list".freeze
+    SOURCE = "eu-data".freeze
 
     def self.fetch
-      Processor.download_xml(API_ENDPOINT, SOURCE)
+      Processor.download_xml(API_ENDPOINT, SOURCE, "../#{SOURCE}/downloaded")
       harmonize
-      puts "Processed yml file is at:  ../data/processed/#{SOURCE}.yaml !"
+      puts "Processed yml file is at:  ../#{SOURCE}/processed !"
+      Processor.file_prepend("../#{SOURCE}/update.log", "Updated at : #{Time.now.strftime("%d-%m-%Y-%H:%M:%S")}\n")
     end
 
     def self.harmonize
-      downloaded_directory = "../data/downloaded"
-      dest_directory = "../data/processed"
+      downloaded_directory = "../#{SOURCE}/downloaded"
+      dest_directory = "../#{SOURCE}/processed"
       processed_data = []
       data = Nokogiri.XML(open("#{downloaded_directory}/#{SOURCE}.xml"))
       data.remove_namespaces!
@@ -44,7 +45,7 @@ module DataSource
       end
 
       FileUtils.mkdir_p dest_directory
-      open("#{dest_directory}/#{SOURCE}.yaml", "w") { |file| file.write(processed_data.to_yaml) }
+      open("#{dest_directory}/sanction_list.yaml", "w") { |file| file.write(processed_data.to_yaml) }
     end
   end
 

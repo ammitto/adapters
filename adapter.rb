@@ -8,12 +8,12 @@ require 'require_all'
 require_all 'data_source'
 require_all 'utils'
 
-time = Time.now.strftime("%d-%m-%Y-%H:%M:%S")
-log_file = "../data/update.log"
-
-DataSource.constants.each do |klass|
+repo_to_update = Dir.glob('../*-data')
+                   .map{|entry| "#{File.basename(entry)
+                   .sub("-data", "").split("-")
+                   .map(&:capitalize).join("")}Extractor" }
+extractors = DataSource.constants.select { |klass| repo_to_update.include?(klass.to_s) }
+extractors.each do |klass|
   "DataSource::#{klass}".constantize.fetch
 end
-
-Processor.file_prepend(log_file, "Updated at : #{time}\n")
-puts "Done at #{time}!"
+puts "Done at #{Time.now.strftime("%d-%m-%Y-%H:%M:%S")}!"
