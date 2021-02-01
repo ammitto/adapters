@@ -12,8 +12,7 @@ repo_to_update = Dir.glob('../*-data')
                    .map{|entry| "#{File.basename(entry)
                    .sub("-data", "").split("-")
                    .map(&:capitalize).join("")}Extractor" }
-extractors = DataSource.constants.select { |klass| repo_to_update.include?(klass.to_s) }
-extractors.each do |klass|
+DataSource.constants.select { |klass| repo_to_update.include?(klass.to_s) }.each do |klass|
   "DataSource::#{klass}".constantize.fetch
 end
 puts "Done at #{Time.now.strftime("%d-%m-%Y-%H:%M:%S")}!"

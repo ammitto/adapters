@@ -7,18 +7,18 @@ module DataSource
     def self.fetch
       Processor.download_xml(API_ENDPOINT, SOURCE, "../#{SOURCE}/downloaded")
       harmonize
-      puts "Processed yml file is at:  ../#{SOURCE}/processed !"
+      puts "Processed yml files are at:  ../#{SOURCE}/processed !"
       Processor.file_prepend("../#{SOURCE}/update.log", "Updated at : #{Time.now.strftime("%d-%m-%Y-%H:%M:%S")}\n")
     end
 
     def self.harmonize
       downloaded_directory = "../#{SOURCE}/downloaded"
       dest_directory = "../#{SOURCE}/processed"
-      processed_data = []
       data = Nokogiri.XML(open("#{downloaded_directory}/#{SOURCE}.xml"))
       data.remove_namespaces!
       sanction_entities = data.xpath("export//sanctionEntity")
-      sanction_entities.each do |sanction_entity|
+      Processor.prepare_directory(dest_directory)
+      sanction_entities.each_with_index do |sanction_entity, index|
         target = {}
         target["names"] = sanction_entity.xpath("nameAlias").collect { |n| n["wholeName"] } rescue ""
         target["source"] = SOURCE
@@ -41,11 +41,8 @@ module DataSource
           target["contact"] = address_info.xpath("contactInfo").collect { |ci| "#{ci['key']}: #{ci['value']}" }.join(", ") rescue ""
           target["address"] = [address]
         end
-        processed_data << target
+        Processor.save_structured_data(dest_directory, target, index)
       end
-
-      FileUtils.mkdir_p dest_directory
-      open("#{dest_directory}/sanction_list.yaml", "w") { |file| file.write(processed_data.to_yaml) }
     end
   end
 

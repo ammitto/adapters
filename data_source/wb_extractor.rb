@@ -8,7 +8,7 @@ module DataSource
     def self.fetch
       download_wb_json
       harmonize
-      puts "Processed yml file is at:  ../#{SOURCE}/processed !"
+      puts "Processed yml files are at:  ../#{SOURCE}/processed !"
       Processor.file_prepend("../#{SOURCE}/update.log", "Updated at : #{Time.now.strftime("%d-%m-%Y-%H:%M:%S")}\n")
     end
 
@@ -31,9 +31,9 @@ module DataSource
     def self.harmonize
       downloaded_directory = "../#{SOURCE}/downloaded"
       dest_directory = "../#{SOURCE}/processed"
-      processed_data = []
       data = JSON.parse(File.read("#{downloaded_directory}/#{SOURCE}.json"))
-      data["response"]["ZPROCSUPP"].each do |sanction_entity|
+      Processor.prepare_directory(dest_directory)
+      data["response"]["ZPROCSUPP"].each_with_index do |sanction_entity, index|
         target = {}
         target["names"] = ["#{sanction_entity["SUPP_PRE_ACRN"]} #{sanction_entity["SUPP_NAME"]}".strip]
         target["country"] = sanction_entity["COUNTRY_NAME"]
@@ -48,11 +48,8 @@ module DataSource
         address["country"] = sanction_entity["COUNTRY_NAME"]
         address["zip"] = sanction_entity["SUPP_ZIP_CODE"] || sanction_entity["SUPP_POST_CODE"]
         target["address"] = [ address ]
-        processed_data << target
+        Processor.save_structured_data(dest_directory, target, index)
       end
-
-      FileUtils.mkdir_p dest_directory
-      open("#{dest_directory}/sanction_list.yaml", "w") { |file| file.write(processed_data.to_yaml) }
     end
 
   end

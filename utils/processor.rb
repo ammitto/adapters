@@ -25,4 +25,14 @@ class Processor
     end
   end
 
+  def self.prepare_directory(directory)
+    FileUtils.mkdir_p directory
+    FileUtils.rm_rf(Dir.glob("#{directory}/*"))
+  end
+
+  def self.save_structured_data(dest_directory, entity, index)
+    name = "#{entity["names"].join(" ").downcase.gsub(/[^0-9a-z ]/i, '').gsub(" ", "-")[0..50]}-#{index}"
+    open("#{dest_directory}/#{name}.yaml", "w") { |file| file.write(entity.to_yaml) }
+  end
+
 end
