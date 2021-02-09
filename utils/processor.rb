@@ -31,7 +31,7 @@ class Processor
   end
 
   def self.save_structured_data(dest_directory, entity, index)
-    name = "#{entity["names"].join(" ").downcase.gsub(/[^0-9a-z ]/i, '').gsub(" ", "-")[0..50]}-#{index}"
+    name = "#{entity["names"].join(" ").downcase.gsub(/[^0-9a-z ]/i, '').strip.gsub(" ", "-")[0..50]}-#{index}"
     open("#{dest_directory}/#{name}.yaml", "w") { |file| file.write(entity.to_yaml) }
   end
 
