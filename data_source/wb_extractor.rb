@@ -32,23 +32,26 @@ module DataSource
       downloaded_directory = "../#{SOURCE}/downloaded"
       dest_directory = "../#{SOURCE}/processed"
       data = JSON.parse(File.read("#{downloaded_directory}/#{SOURCE}.json"))
-      Processor.prepare_directory(dest_directory)
-      data["response"]["ZPROCSUPP"].each_with_index do |sanction_entity, index|
-        target = {}
-        target["names"] = ["#{sanction_entity["SUPP_PRE_ACRN"]} #{sanction_entity["SUPP_NAME"]}".strip]
-        target["country"] = sanction_entity["COUNTRY_NAME"]
-        target["source"] = SOURCE
-        target["ref_number"] = sanction_entity["SUPP_ID"]
-        target["ref_type"] = "World Bank SUPP ID"
-        target["remark"] = sanction_entity["DEBAR_REASON"]
-        address = {}
-        address["street"] = sanction_entity["SUPP_ADDR"]
-        address["city"] = sanction_entity["SUPP_CITY"]
-        address["state"] = sanction_entity["SUPP_PROV_NAME"]
-        address["country"] = sanction_entity["COUNTRY_NAME"]
-        address["zip"] = sanction_entity["SUPP_ZIP_CODE"] || sanction_entity["SUPP_POST_CODE"]
-        target["address"] = [ address ]
-        Processor.save_structured_data(dest_directory, target, index)
+      if data["response"]["ZPROCSUPP"].any?
+        Processor.prepare_directory(dest_directory)
+        data["response"]["ZPROCSUPP"].each_with_index do |sanction_entity, index|
+          target = {}
+          target["names"] = ["#{sanction_entity["SUPP_PRE_ACRN"]} #{sanction_entity["SUPP_NAME"]}".strip]
+          target["country"] = sanction_entity["COUNTRY_NAME"]
+          target["source"] = SOURCE
+          target["ref_number"] = sanction_entity["SUPP_ID"]
+          target["ref_type"] = "World Bank SUPP ID"
+          target["remark"] = sanction_entity["DEBAR_REASON"]
+          address = {}
+          address["street"] = sanction_entity["SUPP_ADDR"]
+          address["city"] = sanction_entity["SUPP_CITY"]
+          address["state"] = sanction_entity["SUPP_PROV_NAME"]
+          address["country"] = sanction_entity["COUNTRY_NAME"]
+          address["zip"] = sanction_entity["SUPP_ZIP_CODE"] || sanction_entity["SUPP_POST_CODE"]
+          target["address"] = [address]
+          Processor.save_structured_data(dest_directory, target, index)
+        end
+
       end
     end
 
