@@ -24,7 +24,7 @@ module DataSource
           name = [sanction.at_xpath("firstName"),
                   sanction.at_xpath("lastName")].compact.map(&:text).reject(&:blank?).map(&:strip).join(" ")
           alias_names = sanction.xpath("akaList//aka").map { |aka| [aka.at_xpath("firstName"), aka.at_xpath("lastName")].join(" ") }.reject(&:blank?)
-          target["entity_type"] = sanction.at_xpath("sdnType") == "Individual" ? "person" : "organization"
+          target["entity_type"] = sanction.at_xpath("sdnType")&.text == "Individual" ? "person" : "organization"
           target["names"] = alias_names
           target["names"].unshift(name)
           target["source"] = SOURCE
